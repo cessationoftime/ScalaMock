@@ -9,10 +9,9 @@ install:
   - git fetch --unshallow --tags
 
 scala:
-  - "2.10.7"
   - "2.11.12"
-  - "2.12.6"
-  - "2.13.0-M3"
+  - "2.12.8"
+  - "2.13.0"
 
 jdk:
   - openjdk8
@@ -32,7 +31,7 @@ cache:
 #   - sudo chmod +x /usr/local/bin/sbt
 
 after_success:
-  - '[[ $TRAVIS_BRANCH == "master" ]] && [[ $TRAVIS_JDK_VERSION == "openjdk8" ]] && { sbt  ++$TRAVIS_SCALA_VERSION publish; };'
+  - '[[ $TRAVIS_BRANCH == "master" ]] && [[ $TRAVIS_JDK_VERSION == "openjdk11" ]] && [[ $SONATYPE_USERNAME != "" ]] && { sbt  ++$TRAVIS_SCALA_VERSION publish; };'
 
 env:
   global:

@@ -18,41 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package org.scalamock.test.scalatest
+package org.scalamock
 
-import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.{AsyncFlatSpec, Matchers}
+import org.scalamock.clazz.Mock
+import org.scalamock.context.MockContext
+import org.scalamock.function.MockFunctions
+import org.scalamock.matchers.Matchers
 
-import scala.concurrent.Future
+/** ScalaMock public interface */
+trait AbstractMockFactoryBase extends Mock with MockFunctions with Matchers { this: MockContext =>
 
-/**
-  * Test to ensure AsyncMockFactory only run test once
-  */
-class AsyncMockFactoryNoDuplicatedRun extends AsyncFlatSpec with Matchers with AsyncMockFactory {
-  trait TestTrait {
-    def mockMethod(): Int
-  }
+  protected def withExpectations[T](what: => T): T
 
-  class ClassUnderTest(protected val testTrait: TestTrait) {
-    def methodUnderTest(): Future[Int] = {
-      TestCounter.alreadyRun = TestCounter.alreadyRun + 1
-      Future(testTrait.mockMethod())
-    }
-  }
-
-  object TestCounter {
-    var alreadyRun: Int = 0
-  }
-
-  "AsyncMockFactory" should "run test case provided successfully" in {
-    val mockTrait = mock[TestTrait]
-    val returnVal = 100
-    (() => mockTrait.mockMethod()).expects().returning(returnVal)
-    val classUnderTest = new ClassUnderTest(mockTrait)
-    classUnderTest.methodUnderTest().map(_ shouldBe returnVal)
-  }
-
-  "AsyncMockFactory" should "have run test case provided only once" in {
-    Future(TestCounter.alreadyRun shouldBe 1)
-  }
+  protected def inAnyOrder[T](what: => T): T
+  protected def inSequence[T](what: => T): T
+  protected def inAnyOrderWithLogging[T](what: => T): T
+  protected def inSequenceWithLogging[T](what: => T): T
 }
